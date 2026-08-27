@@ -3,6 +3,7 @@ import cookieParsor from "cookie-parser"
 import authRouter from "./routes/auth.routes.js";
 import errorHandler from "./middleware/errorHandler.js";
 import projectRouter from "./routes/project.routes.js";
+import taskRouter from "./routes/task.routes.js";
 
 const app =  express();
 
@@ -18,7 +19,8 @@ app.get("/health",(req,res)=>{
 })
 
 app.use("/api/auth",authRouter)
-app.use("/api/projects",projectRouter)
+app.use("/api",projectRouter)
+app.use("/api",taskRouter)
 
 
 
