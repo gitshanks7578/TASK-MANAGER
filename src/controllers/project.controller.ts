@@ -3,7 +3,8 @@ import ApiError from "../utils/apiError.js"
 import { prisma } from "../db/db.js"
 import type { authRequest } from "../middleware/verifyjwt.js"
 import { addMemberSchema, createProjectSchema,createTaskSchema, getTasksInProjectSchema } from "../validator/project.validator.js"
-import { addMemberService, createProjectService,deleteProjectService,getAllProjectsService ,createTaskService, getTasksInProjectService} from "../services/project.service.js"
+import { addMemberService, createProjectService,deleteProjectService,getAllProjectsService ,createTaskService, getTasksInProjectService,getTaskSummaryService} from "../services/project.service.js"
+import { success } from "zod"
 
 
 
@@ -177,6 +178,26 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
             success : true,
             message : "task retrieved successfully",
             data : tasks
+        })
+    } catch (error) {
+        next(error)
+    }
+}
+
+
+export const getTaskSummary = async (req:authRequest,res:Response,next:NextFunction) =>{
+    try {
+        const {project_id} = req.params
+        if(typeof project_id !== "string"){
+            throw new ApiError("invalid project id",400)
+        }
+
+        const summary = await getTaskSummaryService(project_id)
+
+        return res.status(200).json({
+            success:true,
+            message : "summary retrieved successfully",
+            data : summary
         })
     } catch (error) {
         next(error)

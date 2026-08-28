@@ -1,4 +1,3 @@
-import type { isAnyArrayBuffer } from "node:util/types"
 import { prisma } from "../db/db.js"
 import ApiError from "../utils/apiError.js"
 import { createTaskSchema, getTasksInProjectSchema } from "../validator/project.validator.js"
@@ -249,9 +248,73 @@ export const getTasksInProjectService = async (project_id: string, query: z.infe
     return {
         tasks,
         total,
-        pagination : {
-            limit : query.limit,
-            page : query.page
+        pagination: {
+            limit: query.limit,
+            page: query.page
         }
     }
+}
+
+export const getTaskSummaryService = async (project_id: string) => {
+
+    const [tasks, todo, inprogress, done, low, medium, high] = await Promise.all([
+        prisma.task.count({
+            where: {
+                projectId: project_id
+            }
+        }),
+
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                status: "TODO"
+            }
+        }),
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                status: "IN_PROGRESS"
+            }
+        }),
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                status: "DONE"
+            }
+        }),
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                priority: "LOW"
+            }
+        }),
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                priority: "MEDIUM"
+            }
+        }),
+        prisma.task.count({
+            where: {
+                projectId: project_id,
+                priority: "HIGH"
+            }
+        })
+
+    ])
+
+    return {
+        "totalTasks": tasks,
+        "byPriority": {
+            "low": low,
+            "med":  medium,
+            "high": high
+        },
+        "byStatus": {
+            "TODO": todo,
+            "IN_PROGRESS": inprogress,
+            "DONE": done
+        }
+    }
+
 }

@@ -61,12 +61,12 @@ model Task {
   description String?
   status      TaskStatus   @default(TODO)
   priority    TaskPriority @default(MEDIUM)
+  dueDate    DateTime?
+  completedAt DateTime?
 
   projectId  String
   creatorId  String
   assigneeId String?
-  dueDate    DateTime?
-  completedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -97,7 +97,7 @@ enum TaskStatus {
   DONE
 }
 
-enum accStatus{
+enum accStatus {
   LOGGED_IN 
   LOGGED_OUT
   SUSPENDED
