@@ -16,6 +16,7 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         }
         const hashedpassword = await bcrypt.hash(result.data.password, 10)
 
+        
         const user = await registerService(result.data.name, result.data.email, hashedpassword)
 
         if (!user) {
