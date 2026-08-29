@@ -16,16 +16,16 @@ afterAll(async () => {
 })
 
 
-describe("TASK",()=>{
+describe("TASK", () => {
     let token: string
     let projectID: string
     let memberToken: string
-    let nonMemberToken : string;
+    let nonMemberToken: string;
     beforeEach(async () => {
         await prisma.task.deleteMany();
-            await prisma.projectMember.deleteMany();
-            await prisma.project.deleteMany();
-            await prisma.user.deleteMany();
+        await prisma.projectMember.deleteMany();
+        await prisma.project.deleteMany();
+        await prisma.user.deleteMany();
         //register owner
         await request(app)
             .post("/api/auth/register")
@@ -56,29 +56,29 @@ describe("TASK",()=>{
         projectID = project.body.data.id
 
         //register another user
-        await request(app)
-            .post("/api/auth/register")
-            .send({
-                name: "testUser2",
-                email: `member@g.com`,
-                password: "12345678",
-            });
-        //make him login
-        const member = await request(app)
-            .post("/api/auth/login")
-            .send({
-                email: `member@g.com`,
-                password: "12345678",
-            });
-        memberToken = member.body.data.accessToken
+        // await request(app)
+        //     .post("/api/auth/register")
+        //     .send({
+        //         name: "testUser2",
+        //         email: `member@g.com`,
+        //         password: "12345678",
+        //     });
+        // //make him login
+        // const member = await request(app)
+        //     .post("/api/auth/login")
+        //     .send({
+        //         email: `member@g.com`,
+        //         password: "12345678",
+        //     });
+        // memberToken = member.body.data.accessToken
 
         //get him added in the project via the project owner
-         await request(app)
-        .post(`/api/projects/${projectID}/members`)
-        .send({
-            email : "member@g.com"
-        })
-        .set("Authorization",`Bearer ${token}`)
+        //  await request(app)
+        // .post(`/api/projects/${projectID}/members`)
+        // .send({
+        //     email : "member@g.com"
+        // })
+        // .set("Authorization",`Bearer ${token}`)
 
         //non member register
         await request(app)
@@ -98,144 +98,147 @@ describe("TASK",()=>{
             nonMemberToken = nonMemberLogin.body.data.accessToken
 
 
-    },30000)
+    }, 30000)
 
     test("invalid assignee is rejected", async () => {
-    const response = await request(app)
-        .post(`/api/projects/${projectID}/tasks`)
-        .send({
-            title: "Test task",
-            description: "Testing invalid assignee",
-            priority: "MEDIUM",
-            assigneeId: "some-user-id-that-is-not-a-project-member"
-        })
-        .set("Authorization", `Bearer ${token}`)
+        const response = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .send({
+                title: "Test task",
+                description: "Testing invalid assignee",
+                priority: "MEDIUM",
+                assigneeId: "some-user-id-that-is-not-a-project-member"
+            })
+            .set("Authorization", `Bearer ${token}`)
 
-    expect(response.status).toBe(400)
-})
+        expect(response.status).toBe(400)
+    })
 
-// test("task filtering works", async () => {
-//     // Create a TODO task
-//     await request(app)
-//         .post(`/api/projects/${projectID}/tasks`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             title: "Todo task",
-//             description: "This should not appear",
-//             status: "TODO",
-//             priority: "MEDIUM"
-//         })
+    test("task filtering works", async () => {
+        // Create a TODO task
+       const todoTask = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                title: "Todo task",
+                description: "This is a TODO task",
+                status: "TODO",
+                priority: "MEDIUM"
+            })
+             expect(todoTask.status).toBe(201)
+        console.log(todoTask.body)
+        // Create a DONE task
+        const doneTask = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                title: "Done task",
+                description: "This is a DONE task",
+                status: "DONE",
+                priority: "HIGH"
+            })
 
-//     // Create a DONE task
-//     const doneTask = await request(app)
-//         .post(`/api/projects/${projectID}/tasks`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             title: "Done task",
-//             description: "This should appear",
-//             status: "DONE",
-//             priority: "HIGH"
-//         })
+        expect(doneTask.status).toBe(201)
+        console.log(doneTask.body)
 
-//     expect(doneTask.status).toBe(201)
+        // Fetch only DONE tasks
+        const response = await request(app)
+            .get(`/api/projects/${projectID}/tasks?status=DONE`)
+            .set("Authorization", `Bearer ${token}`)
 
-//     // Fetch only DONE tasks
-//     const response = await request(app)
-//         .get(`/api/projects/${projectID}/tasks?status=DONE`)
-//         .set("Authorization", `Bearer ${token}`)
+        expect(response.status).toBe(200)
+        console.log(response.body)
+        expect(response.body.data.tasks).toHaveLength(1)
+        expect(response.body.data.tasks[0].status).toBe("DONE")
+        expect(response.body.data.tasks[0].title).toBe("Done task")
+    },10000)
 
-//     expect(response.status).toBe(200)
+    test("completedAt is set when task becomes DONE", async () => {
+        const task = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                title: "Task to complete",
+                description: "Testing completedAt",
+                priority: "MEDIUM",
+                status : "TODO"
+            })
 
-//     expect(response.body.data.tasks).toHaveLength(1)
-//     expect(response.body.data.tasks[0].status).toBe("DONE")
-//     expect(response.body.data.tasks[0].title).toBe("Done task")
-// })
+        expect(task.status).toBe(201)
 
-// test("completedAt is set when task becomes DONE", async () => {
-//     const task = await request(app)
-//         .post(`/api/projects/${projectID}/tasks`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             title: "Task to complete",
-//             description: "Testing completedAt",
-//             priority: "MEDIUM"
-//         })
+        const taskId = task.body.data.id
 
-//     expect(task.status).toBe(201)
+        const response = await request(app)
+            .patch(`/api/tasks/${taskId}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                status: "DONE"
+            })
 
-//     const taskId = task.body.data.id
+        expect(response.status).toBe(200)
+        expect(response.body.data.status).toBe("DONE")
+        expect(response.body.data.completedAt).not.toBeNull()
+    })
 
-//     const response = await request(app)
-//         .patch(`/api/tasks/${taskId}`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             status: "DONE"
-//         })
+    test("completedAt is cleared when task is reopened", async () => {
+        const task = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                title: "Task to reopen",
+                description: "Testing completedAt clearing",
+                priority: "MEDIUM"
+            })
 
-//     expect(response.status).toBe(200)
-//     expect(response.body.data.status).toBe("DONE")
-//     expect(response.body.data.completedAt).not.toBeNull()
-// })
+        expect(task.status).toBe(201)
 
-// test("completedAt is cleared when task is reopened", async () => {
-//     const task = await request(app)
-//         .post(`/api/projects/${projectID}/tasks`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             title: "Task to reopen",
-//             description: "Testing completedAt clearing",
-//             priority: "MEDIUM"
-//         })
+        const taskId = task.body.data.id
 
-//     expect(task.status).toBe(201)
+        // Complete the task
+        const completed = await request(app)
+            .patch(`/api/tasks/${taskId}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                status: "DONE"
+            })
 
-//     const taskId = task.body.data.id
+        expect(completed.status).toBe(200)
+        expect(completed.body.data.completedAt).not.toBeNull()
 
-//     // Complete the task
-//     const completed = await request(app)
-//         .patch(`/api/tasks/${taskId}`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             status: "DONE"
-//         })
+        // Reopen the task
+        const reopened = await request(app)
+            .patch(`/api/tasks/${taskId}`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                status: "TODO"
+            })
 
-//     expect(completed.status).toBe(200)
-//     expect(completed.body.data.completedAt).not.toBeNull()
+        expect(reopened.status).toBe(200)
+        expect(reopened.body.data.status).toBe("TODO")
+        expect(reopened.body.data.completedAt).toBeNull()
+    })
 
-//     // Reopen the task
-//     const reopened = await request(app)
-//         .patch(`/api/tasks/${taskId}`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             status: "TODO"
-//         })
+    test("non-member cannot update a task", async () => {
+        const task = await request(app)
+            .post(`/api/projects/${projectID}/tasks`)
+            .set("Authorization", `Bearer ${token}`)
+            .send({
+                title: "Protected task",
+                description: "Testing authorization",
+                priority: "MEDIUM"
+            })
 
-//     expect(reopened.status).toBe(200)
-//     expect(reopened.body.data.status).toBe("TODO")
-//     expect(reopened.body.data.completedAt).toBeNull()
-// })
+        expect(task.status).toBe(201)
 
-// test("non-member cannot update a task", async () => {
-//     const task = await request(app)
-//         .post(`/api/projects/${projectID}/tasks`)
-//         .set("Authorization", `Bearer ${token}`)
-//         .send({
-//             title: "Protected task",
-//             description: "Testing authorization",
-//             priority: "MEDIUM"
-//         })
+        const taskId = task.body.data.id
 
-//     expect(task.status).toBe(201)
+        const response = await request(app)
+            .patch(`/api/tasks/${taskId}`)
+            .set("Authorization", `Bearer ${nonMemberToken}`)
+            .send({
+                status: "DONE"
+            })
 
-//     const taskId = task.body.data.id
-
-//     const response = await request(app)
-//         .patch(`/api/tasks/${taskId}`)
-//         .set("Authorization", `Bearer ${nonMemberToken}`)
-//         .send({
-//             status: "DONE"
-//         })
-
-//     expect(response.status).toBe(403)
-// })
+        expect(response.status).toBe(403)
+    })
 })

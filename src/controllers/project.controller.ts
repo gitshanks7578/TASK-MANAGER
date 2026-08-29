@@ -172,7 +172,7 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
         if(typeof id !== "string"){
             throw new ApiError("invalid project id",400);
         }
-
+           console.log("RAW QUERY:", req.query)
         const page = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 10
 
@@ -187,7 +187,7 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
         if(!validationTest.success){
             throw new ApiError("invalid query parameters",400);
         }
-
+        console.log("VALIDATED QUERY" , validationTest.data)
         const tasks = await getTasksInProjectService(id,validationTest.data);
 
         return res.status(200).json({

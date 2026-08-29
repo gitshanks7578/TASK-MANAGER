@@ -169,6 +169,7 @@ export const createTaskService = async (projectID: string, creatorID: string, da
             title: data.title,
             description: data.description ?? null,
             priority: data.priority,
+            status : data.status,
             dueDate: data.dueDate ?? null,
 
             project: {
@@ -199,7 +200,7 @@ export const createTaskService = async (projectID: string, creatorID: string, da
 
 export const getTasksInProjectService = async (project_id: string, query: z.infer<typeof getTasksInProjectSchema>) => {
     const skip = (query.page - 1) * query.limit;
-
+    console.log("SERVICE QUERY:", query)
     //array destrcuturing because promise.all returns an array and we used it to get both tasks and count in one process
     const [tasks, total] = await Promise.all([
         prisma.task.findMany({
@@ -243,7 +244,7 @@ export const getTasksInProjectService = async (project_id: string, query: z.infe
     ])
 
 
-
+console.log("tasks : ",tasks)
 
     return {
         tasks,

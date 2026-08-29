@@ -4,7 +4,29 @@ import z from "zod"
 import type { updateTaskSchema } from "../validator/task.validator.js"
 
 
-export const updateTaskService = async (taskId :string , data : z.infer<typeof updateTaskSchema> ) =>{
+export const updateTaskService = async (taskId :string , data : z.infer<typeof updateTaskSchema>,userid :string ) =>{
+   
+   const task = await prisma.task.findUnique({
+    where : {
+        id : taskId
+    }
+   })
+
+   if(!task){
+    throw new ApiError("task does not exists",404)
+   }
+   const isMember = await prisma.projectMember.findUnique({
+    where : {
+        userId_projectId:{
+            userId : userid,
+            projectId : task.projectId
+        }
+    }
+   })
+   if(!isMember){
+        throw new ApiError("only task members can update tasks",403)
+   }
+   
     return await prisma.task.update({
         where : {
             id : taskId

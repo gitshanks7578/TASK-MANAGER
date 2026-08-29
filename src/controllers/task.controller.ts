@@ -7,8 +7,8 @@ import { deleteTaskService, updateTaskService } from "../services/task.service.j
 
 export const updateTask = async(req:authRequest,res:Response,next:NextFunction) =>{
     try {
-        const {task_id} = req.params
-        if(typeof task_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid task id",400)
         }
         const result = updateTaskSchema.safeParse(req.body)
@@ -17,7 +17,7 @@ export const updateTask = async(req:authRequest,res:Response,next:NextFunction) 
         }
 
 
-        const updatedTask = await updateTaskService(task_id,result.data)
+        const updatedTask = await updateTaskService(id,result.data,req.user!.id)
 
         return res.status(200).json({
             success : true,
@@ -32,13 +32,13 @@ export const updateTask = async(req:authRequest,res:Response,next:NextFunction) 
 
 export const deleteTask = async (req:authRequest,res:Response,next:NextFunction) =>{
     try {
-        const {task_id} = req.params
-        if(typeof task_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid task id",400)
         }
 
 
-        const deletetask = await deleteTaskService(task_id,req.user!.id)
+        const deletetask = await deleteTaskService(id,req.user!.id)
 
         return res.status(200).json({
             success: true,
