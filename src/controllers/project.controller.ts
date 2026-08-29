@@ -54,7 +54,20 @@ export const getProjectById = async(req:authRequest,res:Response,next:NextFuncti
         if ( typeof id !== "string"){
             throw new ApiError("invalid project id",400)
         }
-        const listOfProjects = await prisma.project.findMany({
+        
+        const isMember = await prisma.projectMember.findUnique({
+            where :{
+                userId_projectId:{
+                    userId : req.user!.id,
+                    projectId : id
+                }
+            }
+        })
+
+        if(!isMember){
+            throw new ApiError("only project member can access project details",403)
+        }
+        const Project = await prisma.project.findUnique({
             where : {
                 id
             }
@@ -63,7 +76,7 @@ export const getProjectById = async(req:authRequest,res:Response,next:NextFuncti
         return res.status(200).json({
             status : "success",
             message : "projects retrieved successfully",
-            data : listOfProjects
+            data : Project
         })
     }catch(error){
         next(error)
@@ -73,8 +86,8 @@ export const getProjectById = async(req:authRequest,res:Response,next:NextFuncti
 export const addMember = async(req:authRequest,res : Response,next : NextFunction)=>{
     try {
         const result = addMemberSchema.safeParse(req.body)
-        const {project_id} = req.params
-        if(typeof project_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid project ID",400)
         }
         if(!result.success){
@@ -82,7 +95,7 @@ export const addMember = async(req:authRequest,res : Response,next : NextFunctio
            throw new ApiError(`invalid format : ${message}`,400)
         }
 
-        const user = await addMemberService(project_id,result.data.email,req.user!.id)
+        const user = await addMemberService(id,result.data.email,req.user!.id)
 
         return res.status(200).json({
             success : true,
@@ -96,11 +109,14 @@ export const addMember = async(req:authRequest,res : Response,next : NextFunctio
 }
 export const deleteProjectById = async(req:authRequest,res : Response,next:NextFunction) =>{
     try {
-        const {project_id} = req.params
-        if(typeof project_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid project ID ",400)
         }
-        const deletedProject = await deleteProjectService(project_id,req.user!.id)
+
+
+
+        const deletedProject = await deleteProjectService(id,req.user!.id)
 
         return res.status(200).json({
             success : true,
@@ -114,9 +130,9 @@ export const deleteProjectById = async(req:authRequest,res : Response,next:NextF
 
 export const createTaskInProject = async (req: authRequest,res: Response,next: NextFunction) => {
     try {
-        const { project_id } = req.params
+        const { id } = req.params
 
-        if (typeof project_id !== "string") {
+        if (typeof id !== "string") {
             throw new ApiError("invalid project ID", 400)
         }
 
@@ -134,7 +150,7 @@ export const createTaskInProject = async (req: authRequest,res: Response,next: N
         }
 
         const task = await createTaskService(
-            project_id,
+            id,
             req.user!.id,
             result.data
         )
@@ -152,8 +168,8 @@ export const createTaskInProject = async (req: authRequest,res: Response,next: N
 
 export const getTasksInProject = async(req:authRequest,res:Response,next:NextFunction)=>{
     try {
-        const {project_id} = req.params
-        if(typeof project_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid project id",400);
         }
 
@@ -172,7 +188,7 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
             throw new ApiError("invalid query parameters",400);
         }
 
-        const tasks = await getTasksInProjectService(project_id,validationTest.data);
+        const tasks = await getTasksInProjectService(id,validationTest.data);
 
         return res.status(200).json({
             success : true,
@@ -187,12 +203,12 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
 
 export const getTaskSummary = async (req:authRequest,res:Response,next:NextFunction) =>{
     try {
-        const {project_id} = req.params
-        if(typeof project_id !== "string"){
+        const {id} = req.params
+        if(typeof id !== "string"){
             throw new ApiError("invalid project id",400)
         }
 
-        const summary = await getTaskSummaryService(project_id)
+        const summary = await getTaskSummaryService(id)
 
         return res.status(200).json({
             success:true,
