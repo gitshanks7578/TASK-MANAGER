@@ -3,6 +3,15 @@ import ApiError from "../utils/apiError.js"
 import bcrypt from "bcrypt"
 import jwt  from "jsonwebtoken"
 export const registerService = async (name: string,email : string,password : string)=>{
+    const user = await prisma.user.findUnique({
+        where : {
+            email : email
+        }
+    })
+    if(user){
+        throw new ApiError("user already exists",409)
+    }
+    
     return await prisma.user.create({
         data : {
             name,
