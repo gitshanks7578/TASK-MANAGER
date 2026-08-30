@@ -24,7 +24,7 @@ export const updateTaskService = async (taskId :string , data : z.infer<typeof u
     }
    })
    if(!isMember){
-        throw new ApiError("only task members can update tasks",403)
+        throw new ApiError("only project members can update tasks",403)
    }
    
     return await prisma.task.update({

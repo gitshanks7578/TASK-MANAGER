@@ -17,7 +17,7 @@ export const createTaskSchema = z.object({
     status : z.enum(["TODO","IN_PROGRESS","DONE"]).default("TODO"),
     priority: z.enum(["LOW", "MEDIUM", "HIGH"]).default("MEDIUM"),
     dueDate: z.coerce.date().optional(),
-    assigneeId: z.string().uuid().optional()
+    assigneeId: z.string().optional()
 })
 
 export const getTasksInProjectSchema = z.object({
