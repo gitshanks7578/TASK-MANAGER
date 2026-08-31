@@ -36,12 +36,19 @@ export const createProjectService = async (name: string, description: string, ow
     return project;
 }
 
-export const getAllProjectsService = async (ownerId: string) => {
-    return await prisma.project.findMany({
-        where: {
-            ownerId
+export const getAllProjectsService = async (userid: string) => {
+    const memberships = await prisma.projectMember.findMany({
+        where : {
+            userId : userid,
+        },
+        include:{
+            project : true
         }
     })
+
+    return {
+        projects : memberships.map((membership)=>membership.project)
+    }
 }
 
 export const addMemberService = async (projectID: string, memberEmail: string, ownerID: string) => {
@@ -198,9 +205,24 @@ export const createTaskService = async (projectID: string, creatorID: string, da
 }
 
 
-export const getTasksInProjectService = async (project_id: string, query: z.infer<typeof getTasksInProjectSchema>) => {
+export const getTasksInProjectService = async (project_id: string, query: z.infer<typeof getTasksInProjectSchema>,userid : string) => {
+    
+    const isMember = await prisma.projectMember.findUnique({
+        where : {
+            userId_projectId:{
+                userId : userid,
+                projectId : project_id
+            }
+        }
+    })
+
+    if(!isMember){
+        throw new ApiError("only project members can view tasks",403);
+    }
+    
+    
     const skip = (query.page - 1) * query.limit;
-    console.log("SERVICE QUERY:", query)
+
     //array destrcuturing because promise.all returns an array and we used it to get both tasks and count in one process
     const [tasks, total] = await Promise.all([
         prisma.task.findMany({
@@ -216,6 +238,13 @@ export const getTasksInProjectService = async (project_id: string, query: z.infe
                 ...(query.status && {
                     status: query.status
                 }),
+
+                ...(query.assigneeId && {
+                    assigneeId : query.assigneeId
+                }),
+
+              
+            
             },
             skip,
             take: query.limit,
@@ -237,14 +266,15 @@ export const getTasksInProjectService = async (project_id: string, query: z.infe
                 ...(query.status && {
                     status: query.status
                 }),
+                      ...(query.assigneeId && {
+                    assigneeId : query.assigneeId
+                }),
             }
         })
 
 
     ])
 
-
-console.log("tasks : ",tasks)
 
     return {
         tasks,
@@ -256,8 +286,20 @@ console.log("tasks : ",tasks)
     }
 }
 
-export const getTaskSummaryService = async (project_id: string) => {
+export const getTaskSummaryService = async (project_id: string,userid : string) => {
+     
+    const isMember = await prisma.projectMember.findUnique({
+        where : {
+            userId_projectId:{
+                userId : userid,
+                projectId : project_id
+            }
+        }
+    })
 
+    if(!isMember){
+        throw new ApiError("only project members can view tasks",403);
+    }
     const [tasks, todo, inprogress, done, low, medium, high] = await Promise.all([
         prisma.task.count({
             where: {

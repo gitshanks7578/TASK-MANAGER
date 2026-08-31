@@ -188,7 +188,7 @@ export const getTasksInProject = async(req:authRequest,res:Response,next:NextFun
             throw new ApiError("invalid query parameters",400);
         }
         console.log("VALIDATED QUERY" , validationTest.data)
-        const tasks = await getTasksInProjectService(id,validationTest.data);
+        const tasks = await getTasksInProjectService(id,validationTest.data,req.user!.id);
 
         return res.status(200).json({
             success : true,
@@ -208,7 +208,7 @@ export const getTaskSummary = async (req:authRequest,res:Response,next:NextFunct
             throw new ApiError("invalid project id",400)
         }
 
-        const summary = await getTaskSummaryService(id)
+        const summary = await getTaskSummaryService(id,req.user!.id)
 
         return res.status(200).json({
             success:true,

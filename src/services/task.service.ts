@@ -63,16 +63,20 @@ export const deleteTaskService = async(taskId  :string, userId : string) =>{
     const task = await prisma.task.findUnique({
         where : {
             id : taskId
+        },
+        include:{
+            project:true
         }
     })
-
+   
     
     if(!task){
         throw new ApiError("task with this ID doesn't exist",404)
     }
-    if(task.creatorId !== userId){
-        throw new ApiError("only the task creator can delete the task",403)
+    if(task.creatorId !== userId && task.project.ownerId !== userId){
+        throw new ApiError("unauthorized deletion",403)
     }
+     
 
     return await prisma.task.delete({
         where :{

@@ -22,9 +22,11 @@ export const createTaskSchema = z.object({
 
 export const getTasksInProjectSchema = z.object({
     page: z.coerce.number().int().positive().default(1),
-    limit: z.coerce.number().int().positive().max(100).default(10),
+    limit: z.coerce.number().int().positive().max(50).default(10),
     status : z.enum(["TODO","IN_PROGRESS","DONE"]).optional(),
     priority : z.enum(["LOW","MEDIUM","HIGH"]).optional(),
-    sortBy : z.enum(["createdAt","updatedAt","title","dueDate","priority"]).default("createdAt"),
-    order : z.enum(["asc","desc"]).default("desc")
+    sortBy : z.enum(["createdAt","updatedAt","title","dueDate","priority","assigneeId"]).default("createdAt"),
+    order : z.enum(["asc","desc"]).default("desc"),
+    assigneeId : z.string().optional(),
+    dueDate : z.coerce.date().optional()
 })
