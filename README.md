@@ -1,12 +1,11 @@
 # Task Tracker API
 
-![Node.js](https://img.shields.io/badge/Node.js-22-1B5E20?logo=node.js&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-1E3A5F?logo=typescript&logoColor=white)
-![Express](https://img.shields.io/badge/Express-111111?logo=express&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-064E3B?logo=postgresql&logoColor=white)
-![Prisma](https://img.shields.io/badge/Prisma-3F3F46?logo=prisma&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-9A3412?logo=docker&logoColor=white)
-![CI](https://img.shields.io/badge/CI-6D1F2B?logo=githubactions&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22.x-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-black?style=for-the-badge&logo=express&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-1B4D3E?style=for-the-badge&logo=postgresql&logoColor=white)
+![Prisma](https://img.shields.io/badge/Prisma-7F1D1D?style=for-the-badge&logo=prisma&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-B7410E?style=for-the-badge&logo=docker&logoColor=white)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-4A0E0E?style=for-the-badge&logo=githubactions&logoColor=white)
 
 ## Project overview
 
