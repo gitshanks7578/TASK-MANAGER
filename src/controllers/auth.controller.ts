@@ -5,7 +5,7 @@ import bcrypt from "bcrypt"
 import { registerService, loginService } from "../services/auth.service.js"
 import type { authRequest } from "../middleware/verifyjwt.js"
 import { prisma } from "../db/db.js"
-import jwt from "jsonwebtoken"
+// import jwt from "jsonwebtoken"
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
     try {

@@ -9,7 +9,9 @@
     "test:coverage": "vitest run --coverage",
     "dev": "tsx --watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "keywords": [],
   "author": "",
@@ -27,16 +29,20 @@
     "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/node": "^26.3.0",
     "@types/supertest": "^7.2.1",
     "@vitest/coverage-v8": "^4.1.11",
     "dotenv-cli": "^11.0.0",
+    "eslint": "^10.9.1",
+    "globals": "^17.11.0",
     "prisma": "^6.19.3",
     "supertest": "^7.2.2",
     "tsx": "^4.23.12",
-    "typescript": "^7.0.2",
+    "typescript": "5.9",
+    "typescript-eslint": "^8.68.0",
     "vitest": "^4.1.11"
   }
 }
