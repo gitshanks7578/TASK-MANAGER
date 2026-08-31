@@ -5,6 +5,7 @@ import bcrypt from "bcrypt"
 import { registerService, loginService } from "../services/auth.service.js"
 import type { authRequest } from "../middleware/verifyjwt.js"
 import { prisma } from "../db/db.js"
+import { email } from "zod"
 // import jwt from "jsonwebtoken"
 
 export const register = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +27,13 @@ export const register = async (req: Request, res: Response, next: NextFunction) 
         return res.status(201).json({
             status: "success",
             message: "user created successfully",
-            data: user
+            data: {
+                id : user.id,
+                name : user.name,
+                email : user.email,
+                createdAt : user.createdAt,
+                updatedAt : user.updatedAt
+            }
         })
 
 
