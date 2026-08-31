@@ -91,7 +91,7 @@ Task lists support pagination, sorting, and filters for status, priority, and as
 
 ## Demo
 
-[Demo video](PASTE_DEMO_VIDEO_LINK_HERE)
+[Demo video](https://drive.google.com/file/d/1LrhSTjRQQkAuvmX_s-EbK3HlATYnim-C/view?usp=sharing)
 
 ## AI disclosure
 
