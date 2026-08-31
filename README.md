@@ -61,7 +61,7 @@ The container generates the Prisma Client during the image build and runs the co
 
 ## Testing
 
-Users must remember the testing environment will require to create another database, using .env.test files which will contain testing crendentials.
+Users must remember the testing environment will require to create another database, using `.env.test` files which will contain testing crendentials.
 
 ```bash
 npx dotenv -e .env.test -- npx prisma migrate deploy
