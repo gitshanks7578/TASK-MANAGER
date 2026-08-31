@@ -1,23 +1,29 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-
   pull_request:
-    branches:
-      - main
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
-  test:
+  verify:
+    name: Lint, test and build
     runs-on: ubuntu-latest
 
+    env:
+      NODE_ENV: test
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+
     steps:
-      - name: Checkout code
+      - name: Check out repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -32,11 +38,8 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Run tests
+      - name: Test
         run: npm run test:run
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
 
       - name: Build
         run: npm run build
