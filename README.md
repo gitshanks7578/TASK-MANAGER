@@ -49,9 +49,19 @@ npm run dev
 
 The API runs on `http://localhost:3000` by default. Docker users can run `docker compose up --build` after configuring `.env`.
 
+## Docker
+
+The API includes a production-oriented `Dockerfile` and Docker Compose configuration for containerized local runs.
+
+```bash
+docker compose up --build
+```
+
+The container generates the Prisma Client during the image build and runs the compiled TypeScript application using the configured environment variables. The project includes version-controlled Prisma migrations for database schema management.
+
 ## Testing
 
-Use an isolated PostgreSQL database in `.env.test`; the test suite clears its data during execution. Apply migrations to that database and run:
+Users must remember the testing environment will require to create another database, using .env.test files which will contain testing crendentials.
 
 ```bash
 npx dotenv -e .env.test -- npx prisma migrate deploy
