@@ -62,15 +62,22 @@ npm run test:run
 
 Base path: `/api`. Protected endpoints use `Authorization: Bearer <token>`.
 
-| Method | Endpoint | Purpose |
-| --- | --- | --- |
-| `POST` | `/auth/register`, `/auth/login`, `/auth/logout` | Register, authenticate, or log out |
-| `POST`, `GET` | `/projects` | Create a project or list accessible projects |
-| `GET`, `DELETE` | `/projects/:id` | View a project or delete it as owner |
-| `POST` | `/projects/:id/members` | Add an existing user as project owner |
-| `POST`, `GET` | `/projects/:id/tasks` | Create or list project tasks |
-| `PATCH`, `DELETE` | `/tasks/:id` | Update or delete a task |
-| `GET` | `/projects/:id/summary` | View task totals by status and priority |
+| Method   | Endpoint                | Purpose                                 |
+| -------- | ----------------------- | --------------------------------------- |
+| `POST`   | `/auth/register`        | Register a new user                     |
+| `POST`   | `/auth/login`           | Authenticate a user                     |
+| `POST`   | `/auth/logout`          | Log out the authenticated user          |
+| `POST`   | `/projects`             | Create a project                        |
+| `GET`    | `/projects`             | List accessible projects                |
+| `GET`    | `/projects/:id`         | View a project                          |
+| `DELETE` | `/projects/:id`         | Delete a project as owner               |
+| `POST`   | `/projects/:id/members` | Add an existing user to a project       |
+| `POST`   | `/projects/:id/tasks`   | Create a project task                   |
+| `GET`    | `/projects/:id/tasks`   | List project tasks                      |
+| `PATCH`  | `/tasks/:id`            | Update a task                           |
+| `DELETE` | `/tasks/:id`            | Delete a task                           |
+| `GET`    | `/projects/:id/summary` | View task totals by status and priority |
+
 
 Task lists support pagination, sorting, and filters for status, priority, and assignee; the maximum page size is 50. Project task lists and summaries require project membership. A task may be deleted by its creator or the project owner.
 
